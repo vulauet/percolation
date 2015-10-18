@@ -35,26 +35,32 @@ public class Percolation
   else if (i == size) bott[size*(size-1)+j] = true;
   opened++;
   int index = (i-1)*size+j;
-  if (checkInput(i, j-1) && isOpen(i, j-1) && !wqu.connected(index-1, index)) {
+  int f_index = wqu.find(index);
+  // if (checkInput(i, j-1) && isOpen(i, j-1) && !wqu.connected(index-1, index)) {
+  if (checkInput(i, j-1) && isOpen(i, j-1) && (f_index != wqu.find(index-1))) {
     wqu.union(index-1, index);
     if (full[index-1]) full[index] = true;
-  }
     if (bott[index-1]) bott[index] = true;
-  if (checkInput(i, j+1) && isOpen(i, j+1) && !wqu.connected(index+1, index)) {
+  }
+  // if (checkInput(i, j+1) && isOpen(i, j+1) && !wqu.connected(index+1, index)) {
+  if (checkInput(i, j+1) && isOpen(i, j+1) && (f_index != wqu.find(index+1))) {
     wqu.union(index+1, index);  
     if (full[index+1]) full[index] = true;
     if (bott[index+1]) bott[index] = true;
   }
-  if (checkInput(i-1, j) && isOpen(i-1, j) && !wqu.connected(index-size, index)) {
+  // if (checkInput(i-1, j) && isOpen(i-1, j) && !wqu.connected(index-size, index)) {
+  if (checkInput(i-1, j) && isOpen(i-1, j) && (f_index != wqu.find(index-size))) {
     wqu.union(index-size, index);
     if (full[index-size]) full[index] = true;
     if (bott[index-size]) bott[index] = true;
   }
-  if (checkInput(i+1, j) && isOpen(i+1, j) && !wqu.connected(index+size, index)) {
+  // if (checkInput(i+1, j) && isOpen(i+1, j) && !wqu.connected(index+size, index)) {
+  if (checkInput(i+1, j) && isOpen(i+1, j) && (f_index != wqu.find(index+size))) {
     wqu.union(index+size, index);
     if (full[index+size]) full[index] = true;
     if (bott[index+size]) bott[index] = true;
   }
+  // if (opened >= size && isFull(i, j) && connectToBottom(i, j)) percolated = true;
   if (isFull(i, j) && connectToBottom(i, j)) percolated = true;
  }
  
@@ -64,14 +70,19 @@ public class Percolation
   return grid[i][j]; 
  }
  
+ private int dist(int x, int y, int t, int k) {
+  return Math.abs(x-t) + Math.abs(y - k)+1;
+ }
+ 
  public boolean isFull(int i, int j) 
  {
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
   if (!isOpen(i, j)) return false;
   if (full[(i-1)*size+j]) return true;
+  int f_index = wqu.find((i-1)*size+j);
   for (int k = 1; k <= size; k++) {
-   if (isOpen(1, k) && wqu.connected(k, (i-1)*size+j)) {
- full[(i-1)*size+j] = true;
+   if ((dist(i, j, 1, k) <= opened) && isOpen(1, k) && (f_index == wqu.find(k))) {
+    full[(i-1)*size+j] = true;
     return true;
    }  
   } 
@@ -83,10 +94,11 @@ private boolean connectToBottom(int i, int j)
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
   if (!isOpen(i, j)) return false;
   if (bott[(i-1)*size+j]) return true;
+  int f_index = wqu.find((i-1)*size+j);
   for (int k = 1; k <= size; k++) {
-   if (isOpen(size, k) && wqu.connected(size*(size-1)+k, (i-1)*size+j)) {
+   if ((dist(i, j, size, k) <= opened) && isOpen(size, k) && (f_index == wqu.find((size-1)*size+k))) {
     bott[(i-1)*size+j] = true;
-   return true;
+    return true;
    }
   }
   return false;
