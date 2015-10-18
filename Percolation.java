@@ -61,7 +61,50 @@ public class Percolation
     if (bott[index+size]) bott[index] = true;
   }
   // if (opened >= size && isFull(i, j) && connectToBottom(i, j)) percolated = true;
+  if (full[index]) update_full(i, j);
+  if (bott[index]) update_bott(i, j);
   if (isFull(i, j) && connectToBottom(i, j)) percolated = true;
+  // if (full[index] && bott[index]) percolated = true;
+ }
+ 
+ private void update_full(int i, int j) {
+  int index = (i-1)*size + j;
+  if (checkInput(i-1, j) && isOpen(i-1, j) && !full[index-size]) {
+   full[index-size] = true;
+   update_full(i-1, j);   
+  }
+  if (checkInput(i, j-1) && isOpen(i, j-1) && !full[index-1]) {
+   full[index-1] = true;
+   update_full(i, j-1);   
+  } 
+  if (checkInput(i, j+1) && isOpen(i, j+1) && !full[index+1]) {
+   full[index+1] = true;
+   update_full(i, j+1);   
+  }
+  if (checkInput(i+1, j) && isOpen(i+1, j) && !full[index+size]) {
+   full[index+size] = true;
+   update_full(i+1, j);   
+  } 
+ }
+ 
+ private void update_bott(int i, int j) {
+  int index = (i-1)*size + j;
+  if (checkInput(i-1, j) && isOpen(i-1, j) && !bott[index-size]) {
+   bott[index-size] = true;
+   update_bott(i-1, j);   
+  }
+  if (checkInput(i, j-1) && isOpen(i, j-1) && !bott[index-1]) {
+   bott[index-1] = true;
+   update_bott(i, j-1);   
+  } 
+  if (checkInput(i, j+1) && isOpen(i, j+1) && !bott[index+1]) {
+   bott[index+1] = true;
+   update_bott(i, j+1);   
+  }
+  if (checkInput(i+1, j) && isOpen(i+1, j) && !bott[index+size]) {
+   bott[index+size] = true;
+   update_bott(i+1, j);   
+  } 
  }
  
  public boolean isOpen(int i, int j) 
@@ -78,30 +121,34 @@ public class Percolation
  {
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
   if (!isOpen(i, j)) return false;
-  if (full[(i-1)*size+j]) return true;
-  int f_index = wqu.find((i-1)*size+j);
-  for (int k = 1; k <= size; k++) {
-   if ((dist(i, j, 1, k) <= opened) && isOpen(1, k) && (f_index == wqu.find(k))) {
-    full[(i-1)*size+j] = true;
-    return true;
-   }  
-  } 
-  return false;
+  // if (full[(i-1)*size+j]) return true;
+  // int f_index = wqu.find((i-1)*size+j);
+  // for (int k = 1; k <= size; k++) {
+   // if ((dist(i, j, 1, k) <= opened) && isOpen(1, k) && (f_index == wqu.find(k))) {
+    // full[(i-1)*size+j] = true;
+    // return true;
+   // }  
+  // } 
+  // return false;
+  
+  return full[(i-1)*size+j];
  }
  
 private boolean connectToBottom(int i, int j)
  {
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
   if (!isOpen(i, j)) return false;
-  if (bott[(i-1)*size+j]) return true;
-  int f_index = wqu.find((i-1)*size+j);
-  for (int k = 1; k <= size; k++) {
-   if ((dist(i, j, size, k) <= opened) && isOpen(size, k) && (f_index == wqu.find((size-1)*size+k))) {
-    bott[(i-1)*size+j] = true;
-    return true;
-   }
-  }
-  return false;
+  // if (bott[(i-1)*size+j]) return true;
+  // int f_index = wqu.find((i-1)*size+j);
+  // for (int k = 1; k <= size; k++) {
+   // if ((dist(i, j, size, k) <= opened) && isOpen(size, k) && (f_index == wqu.find((size-1)*size+k))) {
+    // bott[(i-1)*size+j] = true;
+    // return true;
+   // }
+  // }
+  // return false;
+  
+  return bott[(i-1)*size+j];
  }
  
  public boolean percolates()
