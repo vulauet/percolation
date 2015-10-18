@@ -1,0 +1,65 @@
+import edu.princeton.cs.algs4.StdRandom; 
+import edu.princeton.cs.algs4.StdStats; 
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import edu.princeton.cs.algs4.*;
+
+public class Percolation
+{
+	private boolean[][] grid;
+	public WeightedQuickUnionUF wqu;
+	private int size;
+	
+	public Percolation(int N) 
+	{	
+		grid = new boolean[N+1][N+1]; 
+		wqu = new WeightedQuickUnionUF((N+1)*(N+1));
+		size = N;
+	}
+	
+	public void open(int i, int j) 
+	{
+		grid[i][j] = true; 
+		if (isOpen(i-1,j)) wqu.union((i-2)*size+j, (i-1)*size+j);
+		if (isOpen(i+1,j)) wqu.union(i*size+j, (i-1)*size+j);
+		if (isOpen(i,j-1)) wqu.union((i-1)*size+j-1, (i-1)*size+j);
+		if (isOpen(i,j+1)) wqu.union((i-1)*size+j+1, (i-1)*size+j);
+	}
+	
+	public boolean isOpen(int i, int j) 
+	{
+		if (i<0 || i>size || j<0 || j>size) return false;
+		return grid[i][j] == true; 
+	}
+	
+	public boolean isFull(int i, int j) 
+	{
+		for (int k=1; k<=size; k++)
+			if (wqu.connected(k, (i-1)*size+j)) return true;
+		return false;
+	}
+	public boolean percolates()
+	{
+		for (int k=1; k<=size; k++) if (isFull(size, k)) return true;
+		return false;
+	}
+	
+	// public static void main(String[] args)
+	// {
+		// Perculation pcl = new Perculation(4);
+		// // while (!StdIn.isEmpty())
+		// // {
+			// // int p = StdIn.readInt();
+			// // int q = StdIn.readInt();
+			// // if (!pcl.isOpen(p, q)) {
+				// // pcl.open(p, q);
+				// // StdOut.println(p + " " + q);
+			// // }
+		// // }
+		// pcl.open(1,1);
+		// pcl.open(2,1);
+		// pcl.open(3,1);
+		// pcl.open(4,1);
+		// if (pcl.percolates()) StdOut.println("Success");
+		// else StdOut.println("Try Again");
+	// }
+}
