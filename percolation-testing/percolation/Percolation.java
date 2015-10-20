@@ -5,7 +5,6 @@ public class Percolation
  private boolean[][] grid;
  private WeightedQuickUnionUF wqu;
  private int size;
- private int opened;
  
  public Percolation(int N) 
  { 
@@ -13,7 +12,6 @@ public class Percolation
   grid = new boolean[N+1][N+1]; 
   wqu = new WeightedQuickUnionUF((N+1)*(N+1));
   size = N;
-  opened = 0;
  }
  
  private boolean checkInput(int i, int j) 
@@ -25,17 +23,18 @@ public class Percolation
  public void open(int i, int j) 
  {
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
-  grid[i][j] = true; 
-  opened++;
+  grid[i][j] = true;  
   int index = (i-1)*size+j;
-  if (checkInput(i-1, j) && isOpen(i-1, j) && !wqu.connected(index-size, index)) 
-   wqu.union(index-size, index);
-  if (checkInput(i+1, j) && isOpen(i+1, j) && !wqu.connected(index+size, index)) 
-   wqu.union(index+size, index);
-  if (checkInput(i, j-1) && isOpen(i, j-1) && !wqu.connected(index-1, index)) 
-   wqu.union(index-1, index);
+  if (i == 1) wqu.union(index, 0);
+  if (i == size) wqu.union(index, size*size+1);
+  if (checkInput(i, j-1) && isOpen(i, j-1) && !wqu.connected(index-1, index))
+    wqu.union(index-1, index);
   if (checkInput(i, j+1) && isOpen(i, j+1) && !wqu.connected(index+1, index))
-   wqu.union(index+1, index);
+    wqu.union(index+1, index);  
+  if (checkInput(i-1, j) && isOpen(i-1, j) && !wqu.connected(index-size, index))
+    wqu.union(index-size, index);
+  if (checkInput(i+1, j) && isOpen(i+1, j) && !wqu.connected(index+size, index))
+    wqu.union(index+size, index);
  }
  
  public boolean isOpen(int i, int j) 
@@ -47,17 +46,11 @@ public class Percolation
  public boolean isFull(int i, int j) 
  {
   if (i < 1 || i > size || j < 1 || j > size) throw new IndexOutOfBoundsException("index out of bounds");
-  if (!isOpen(i, j)) return false;
-  for (int k = 1; k <= size; k++)
-   if (isOpen(1, k) && wqu.connected(k, (i-1)*size+j)) return true;
-  return false;
+  return isOpen(i, j) && wqu.connected(0, (i-1)*size+j);
  }
+ 
  public boolean percolates()
- {
-  if (opened < size) return false;
-  for (int k = 1; k <= size; k++) if (isOpen(size, k) && isFull(size, k)) return true;
-  return false;
- }
+ {  return wqu.connected(0, size*size+1); }
  
  // public static void main(String[] args)
  // {
